@@ -241,6 +241,7 @@ function renderEventRows() {
       <td>${metrics.attendanceRate}%</td>
       <td><span class="status-badge ${STATUS_CLASSES[event.status]}">${escapeHtml(event.status)}</span></td>
       <td><div class="row-actions">
+        <button class="table-action" type="button" data-action="view-registrations" data-event-id="${escapeHtml(event.id)}">View registrations</button>
         ${registrationAction}
         <button class="table-action" type="button" data-action="edit-event" data-event-id="${escapeHtml(event.id)}">Edit</button>
         <button class="table-action delete-action" type="button" data-action="delete-event" data-event-id="${escapeHtml(event.id)}">Delete</button>
@@ -573,6 +574,10 @@ elements.eventsBody.addEventListener("click", (clickEvent) => {
   const event = data.events.find((item) => item.id === button.dataset.eventId);
   if (button.dataset.action === "register") {
     openRegistrationDialog(button.dataset.eventId);
+  } else if (button.dataset.action === "view-registrations" && event) {
+    elements.registrationEventFilter.value = event.id;
+    renderRegistrations();
+    document.querySelector("#registrations").scrollIntoView({ behavior: "smooth", block: "start" });
   } else if (button.dataset.action === "edit-event" && event) {
     openEventDialog(event);
   } else if (button.dataset.action === "delete-event") {
