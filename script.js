@@ -23,6 +23,14 @@ const elements = {
   registrationSearch: document.querySelector("#registration-search"),
   registrationEventFilter: document.querySelector("#registration-event-filter"),
   attendanceFilter: document.querySelector("#attendance-filter"),
+  attendanceSummaryScope: document.querySelector("#attendance-summary-scope"),
+  summaryRegistered: document.querySelector("#summary-registered"),
+  summaryPresent: document.querySelector("#summary-present"),
+  summaryAbsent: document.querySelector("#summary-absent"),
+  summaryRate: document.querySelector("#summary-rate"),
+  summaryProgress: document.querySelector("#summary-progress"),
+  summaryProgressFill: document.querySelector("#summary-progress-fill"),
+  checkInStatus: document.querySelector("#check-in-status"),
   registrationsBody: document.querySelector("#registrations-table-body"),
   statusReport: document.querySelector("#status-report"),
   bestEvent: document.querySelector("#best-event"),
@@ -296,6 +304,7 @@ function renderRegistrations() {
   const query = elements.registrationSearch.value.trim().toLocaleLowerCase();
   const eventId = elements.registrationEventFilter.value;
   const attendance = elements.attendanceFilter.value;
+  renderAttendanceSummary(eventId);
   const registrations = data.registrations.filter((registration) => {
     const matchesQuery = !query
       || registration.studentName.toLocaleLowerCase().includes(query)
@@ -332,6 +341,57 @@ function renderRegistrations() {
       <td><div class="row-actions">${attendanceAction}<button class="table-action delete-action" type="button" data-action="cancel-registration" data-registration-id="${escapeHtml(registration.id)}">Cancel</button></div></td>
     </tr>`;
   }).join("");
+}
+
+function renderAttendanceSummary(eventId) {
+  const selectedEvent = data.events.find((event) => event.id === eventId);
+  const scopedEvents = selectedEvent ? [selectedEvent] : data.events;
+  const scopedEventIds = new Set(scopedEvents.map((event) => event.id));
+  const registrations = data.registrations.filter((registration) => scopedEventIds.has(registration.eventId));
+  const present = registrations.filter((registration) => registration.present).length;
+  const absent = registrations.length - present;
+  const rate = registrations.length === 0 ? 0 : Math.round((present / registrations.length) * 100);
+  const today = localDateString();
+  const eventsToday = scopedEvents.filter((event) => event.date === today);
+  const pendingToday = registrations.filter((registration) =>
+    !registration.present && eventsToday.some((event) => event.id === registration.eventId)
+  ).length;
+
+  elements.attendanceSummaryScope.textContent = selectedEvent ? selectedEvent.name : "All events";
+  elements.summaryRegistered.textContent = String(registrations.length);
+  elements.summaryPresent.textContent = String(present);
+  elements.summaryAbsent.textContent = String(absent);
+  elements.summaryRate.textContent = `${rate}%`;
+  elements.summaryProgress.setAttribute("aria-valuenow", String(rate));
+  elements.summaryProgressFill.style.width = `${rate}%`;
+  elements.checkInStatus.className = "check-in-status";
+
+  if (selectedEvent) {
+    if (selectedEvent.date === today) {
+      elements.checkInStatus.classList.add(pendingToday > 0 ? "available" : "complete");
+      elements.checkInStatus.textContent = pendingToday > 0
+        ? `Check-in is open today · ${pendingToday} remaining`
+        : "Check-in is open today · All checked in";
+    } else if (selectedEvent.date > today) {
+      elements.checkInStatus.classList.add("upcoming");
+      elements.checkInStatus.textContent = `Check-in opens ${formatDate(selectedEvent.date)}`;
+    } else {
+      elements.checkInStatus.classList.add("closed");
+      elements.checkInStatus.textContent = "Event date passed · Check-in closed";
+    }
+    return;
+  }
+
+  if (eventsToday.length === 0) {
+    elements.checkInStatus.classList.add("upcoming");
+    elements.checkInStatus.textContent = "No events scheduled for check-in today";
+  } else if (pendingToday === 0) {
+    elements.checkInStatus.classList.add("complete");
+    elements.checkInStatus.textContent = "Today's events are fully checked in";
+  } else {
+    elements.checkInStatus.classList.add("available");
+    elements.checkInStatus.textContent = `Check-in is open today · ${pendingToday} remaining`;
+  }
 }
 
 function renderReports() {
