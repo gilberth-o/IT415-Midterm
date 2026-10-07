@@ -1366,3 +1366,121 @@ td small {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+body {
+  font-size: 15px;
+}
+
+.nav-link,
+.welcome-subtitle {
+  font-size: 14px;
+}
+
+.breadcrumb,
+.semester-pill,
+.stat-label,
+.section-heading p,
+.filter-label,
+.filter-control > span,
+.best-event > span:last-child {
+  font-size: 13px;
+}
+
+.eyebrow,
+.stat-note,
+.page-footer,
+.attendance-summary-heading p,
+.attendance-metric > span,
+.report-kicker,
+.form-field small {
+  font-size: 11px;
+}
+
+.primary-button,
+.secondary-button,
+.filter-row .control-select,
+.registration-count > span,
+.best-event strong {
+  font-size: 13px;
+}
+
+.filter-row .control-select,
+.search-field,
+.search-field input {
+  min-height: 39px;
+}
+
+.search-field input {
+  font-size: 13px;
+}
+
+th {
+  font-size: 11px;
+}
+
+td {
+  font-size: 13px;
+}
+
+td strong {
+  font-size: 13px;
+}
+
+td small {
+  font-size: 11px;
+}
+
+.status-badge,
+.attendance-badge {
+  font-size: 11px;
+}
+
+.table-action {
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.attendance-summary-heading h3 {
+  font-size: 14px;
+}
+
+.check-in-status {
+  font-size: 11px;
+}
+
+.attendance-metric > strong {
+  font-size: 19px;
+}
+
+.report-status .status-badge {
+  font-size: 11px;
+}
+
+.best-event strong {
+  font-size: 14px;
+}
+
+.app-dialog .form-field {
+  font-size: 13px;
+}
+
+.form-field input,
+.form-field select {
+  font-size: 14px;
+}
+
+.dialog-error {
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .nav-link {
+    font-size: 13px;
+  }
+
+  .section-heading p,
+  .filter-label,
+  .filter-control > span {
+    font-size: 12px;
+  }
+}
