@@ -239,11 +239,14 @@ function renderEventRows() {
     const registrationAction = event.status === "Open for Registration"
       ? `<button class="table-action primary-action" type="button" data-action="register" data-event-id="${escapeHtml(event.id)}">Register</button>`
       : "";
-    const lifecycleAction = metrics.registered > 0
-      ? event.status === "Completed"
-        ? '<button class="table-action disabled-action" type="button" disabled>Completed</button>'
-        : `<button class="table-action" type="button" data-action="complete-event" data-event-id="${escapeHtml(event.id)}">Complete</button>`
-      : `<button class="table-action delete-action" type="button" data-action="delete-event" data-event-id="${escapeHtml(event.id)}">Delete</button>`;
+    const editAction = event.status === "Completed"
+      ? '<button class="table-action disabled-action" type="button" disabled title="Completed events cannot be edited.">Locked</button>'
+      : `<button class="table-action" type="button" data-action="edit-event" data-event-id="${escapeHtml(event.id)}">Edit</button>`;
+    const lifecycleAction = event.status === "Completed"
+      ? ""
+      : metrics.registered > 0
+        ? `<button class="table-action" type="button" data-action="complete-event" data-event-id="${escapeHtml(event.id)}">Complete</button>`
+        : `<button class="table-action delete-action" type="button" data-action="delete-event" data-event-id="${escapeHtml(event.id)}">Delete</button>`;
 
     return `<tr>
       <td><div class="event-name"><span class="event-color lavender"></span><span><strong>${escapeHtml(event.name)}</strong><small>${metrics.registered} registered</small></span></div></td>
@@ -257,7 +260,7 @@ function renderEventRows() {
       <td><div class="row-actions">
         <button class="table-action" type="button" data-action="view-registrations" data-event-id="${escapeHtml(event.id)}">View registrations</button>
         ${registrationAction}
-        <button class="table-action" type="button" data-action="edit-event" data-event-id="${escapeHtml(event.id)}">Edit</button>
+        ${editAction}
         ${lifecycleAction}
       </div></td>
     </tr>`;
@@ -376,6 +379,10 @@ function render() {
 }
 
 function openEventDialog(event) {
+  if (event?.status === "Completed") {
+    showNotice("Completed events cannot be edited.", "error");
+    return;
+  }
   elements.eventForm.reset();
   elements.eventFormError.hidden = true;
   elements.eventId.value = event?.id ?? "";
@@ -417,6 +424,10 @@ function handleEventSubmit(formEvent) {
   elements.eventFormError.hidden = true;
   const id = elements.eventId.value;
   const current = data.events.find((event) => event.id === id);
+  if (current?.status === "Completed") {
+    setFormError(elements.eventFormError, "Completed events cannot be edited.");
+    return;
+  }
   const capacity = Number(elements.eventCapacity.value);
 
   if (!Number.isSafeInteger(capacity) || capacity < 1) {
