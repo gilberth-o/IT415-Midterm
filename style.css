@@ -914,6 +914,107 @@ td small {
   gap: 7px;
 }
 
+.attendance-summary {
+  margin: 0 20px 17px;
+  padding: 14px 15px 12px;
+  border: 1px solid #eceaf8;
+  border-radius: 9px;
+  background: linear-gradient(110deg, #faf9ff, #fff 72%);
+}
+
+.attendance-summary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.attendance-summary-heading h3 {
+  margin: 0 0 3px;
+  color: #34364d;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-size: 12px;
+}
+
+.attendance-summary-heading p {
+  margin: 0;
+  color: #898da0;
+  font-size: 10px;
+}
+
+.check-in-status {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 14px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.check-in-status.available {
+  color: #26764f;
+  background: #e8f7ee;
+}
+
+.check-in-status.complete {
+  color: #4f5ca1;
+  background: #eeeffb;
+}
+
+.check-in-status.upcoming {
+  color: #936527;
+  background: #fff4e2;
+}
+
+.check-in-status.closed {
+  color: #7a7d8e;
+  background: #eff0f4;
+}
+
+.attendance-summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.attendance-metric {
+  display: grid;
+  gap: 4px;
+}
+
+.attendance-metric > span {
+  color: #898da0;
+  font-size: 9px;
+}
+
+.attendance-metric > strong {
+  color: #36384e;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.attendance-metric.rate-metric > strong {
+  color: #5d52c9;
+}
+
+.summary-progress {
+  height: 5px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #e9e8f1;
+}
+
+.summary-progress > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8a7de8, #6255d9);
+  transition: width 180ms ease;
+}
+
 .secondary-button {
   display: inline-flex;
   min-height: 34px;
@@ -1317,6 +1418,11 @@ td small {
     padding-left: 14px;
   }
 
+  .attendance-summary {
+    margin-right: 14px;
+    margin-left: 14px;
+  }
+
   th:first-child,
   td:first-child {
     padding-left: 14px;
@@ -1342,6 +1448,16 @@ td small {
 
   .search-field input {
     width: 100%;
+  }
+
+  .attendance-summary-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .attendance-summary-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 13px;
   }
 }
 

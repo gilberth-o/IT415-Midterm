@@ -127,6 +127,24 @@
               <label class="filter-control"><span>Attendance</span><select id="attendance-filter" class="control-select"><option value="all">All</option><option value="Present">Present</option><option value="Not present">Not present</option></select></label>
               <button class="secondary-button" id="register-student-button" type="button">＋ Register student</button>
             </div>
+            <section class="attendance-summary" aria-labelledby="attendance-summary-title" aria-live="polite">
+              <div class="attendance-summary-heading">
+                <div>
+                  <h3 id="attendance-summary-title">Attendance overview</h3>
+                  <p id="attendance-summary-scope">All events</p>
+                </div>
+                <span class="check-in-status" id="check-in-status"></span>
+              </div>
+              <div class="attendance-summary-metrics">
+                <div class="attendance-metric"><span>Registered</span><strong id="summary-registered">0</strong></div>
+                <div class="attendance-metric"><span>Present</span><strong id="summary-present">0</strong></div>
+                <div class="attendance-metric"><span>Not checked in</span><strong id="summary-absent">0</strong></div>
+                <div class="attendance-metric rate-metric"><span>Attendance rate</span><strong id="summary-rate">0%</strong></div>
+              </div>
+              <div class="summary-progress" role="progressbar" aria-label="Attendance rate" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="summary-progress">
+                <span id="summary-progress-fill"></span>
+              </div>
+            </section>
             <div class="table-scroll">
               <table>
                 <thead>
