@@ -2,6 +2,7 @@
 
 const STORAGE_KEY = "campushub-event-manager-v1";
 const EVENT_STATUSES = ["Draft", "Open for Registration", "Closed", "Completed"];
+const DUPLICATE_ID_MESSAGE = "Already registered: this student ID is already registered for this event. Enter a different ID.";
 const STATUS_CLASSES = {
   Draft: "draft",
   "Open for Registration": "open",
@@ -207,6 +208,14 @@ function eventMetrics(event) {
     present,
     attendanceRate: registrations.length === 0 ? 0 : Math.round((present / registrations.length) * 100)
   };
+}
+
+function isStudentAlreadyRegistered(eventId, studentId) {
+  const normalizedId = studentId.trim().toLocaleLowerCase();
+  return normalizedId !== "" && data.registrations.some((registration) =>
+    registration.eventId === eventId
+    && registration.studentId.trim().toLocaleLowerCase() === normalizedId
+  );
 }
 
 function registrationEventName(registration) {
@@ -461,12 +470,9 @@ function handleRegistrationSubmit(formEvent) {
   }
 
   const studentId = elements.studentId.value.trim();
-  const duplicate = data.registrations.some((registration) =>
-    registration.eventId === event.id
-    && registration.studentId.toLocaleLowerCase() === studentId.toLocaleLowerCase()
-  );
-  if (duplicate) {
-    setFormError(elements.registrationFormError, "This student ID is already registered for this event.");
+  if (isStudentAlreadyRegistered(event.id, studentId)) {
+    setFormError(elements.registrationFormError, DUPLICATE_ID_MESSAGE);
+    elements.studentId.focus();
     return;
   }
 
@@ -493,6 +499,16 @@ function handleRegistrationSubmit(formEvent) {
   elements.registrationDialog.close();
   render();
   showNotice(`${registration.studentName} registered for ${event.name}.`);
+}
+
+function updateDuplicateIdMessage() {
+  const selectedEventId = elements.registrationEvent.value;
+  const duplicate = isStudentAlreadyRegistered(selectedEventId, elements.studentId.value);
+  if (duplicate) {
+    setFormError(elements.registrationFormError, DUPLICATE_ID_MESSAGE);
+  } else if (elements.registrationFormError.textContent === DUPLICATE_ID_MESSAGE) {
+    elements.registrationFormError.hidden = true;
+  }
 }
 
 function deleteEvent(eventId) {
@@ -561,6 +577,8 @@ elements.registrationEventFilter.addEventListener("change", renderRegistrations)
 elements.attendanceFilter.addEventListener("change", renderRegistrations);
 elements.eventForm.addEventListener("submit", handleEventSubmit);
 elements.registrationForm.addEventListener("submit", handleRegistrationSubmit);
+elements.registrationEvent.addEventListener("change", updateDuplicateIdMessage);
+elements.studentId.addEventListener("input", updateDuplicateIdMessage);
 document.querySelector("#create-event-button").addEventListener("click", () => openEventDialog());
 document.querySelector("#register-student-button").addEventListener("click", () => openRegistrationDialog());
 document.querySelectorAll("[data-close-dialog]").forEach((button) => {
