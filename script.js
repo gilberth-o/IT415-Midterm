@@ -239,6 +239,11 @@ function renderEventRows() {
     const registrationAction = event.status === "Open for Registration"
       ? `<button class="table-action primary-action" type="button" data-action="register" data-event-id="${escapeHtml(event.id)}">Register</button>`
       : "";
+    const lifecycleAction = metrics.registered > 0
+      ? event.status === "Completed"
+        ? '<button class="table-action disabled-action" type="button" disabled>Completed</button>'
+        : `<button class="table-action" type="button" data-action="complete-event" data-event-id="${escapeHtml(event.id)}">Complete</button>`
+      : `<button class="table-action delete-action" type="button" data-action="delete-event" data-event-id="${escapeHtml(event.id)}">Delete</button>`;
 
     return `<tr>
       <td><div class="event-name"><span class="event-color lavender"></span><span><strong>${escapeHtml(event.name)}</strong><small>${metrics.registered} registered</small></span></div></td>
@@ -253,7 +258,7 @@ function renderEventRows() {
         <button class="table-action" type="button" data-action="view-registrations" data-event-id="${escapeHtml(event.id)}">View registrations</button>
         ${registrationAction}
         <button class="table-action" type="button" data-action="edit-event" data-event-id="${escapeHtml(event.id)}">Edit</button>
-        <button class="table-action delete-action" type="button" data-action="delete-event" data-event-id="${escapeHtml(event.id)}">Delete</button>
+        ${lifecycleAction}
       </div></td>
     </tr>`;
   }).join("");
@@ -518,7 +523,7 @@ function deleteEvent(eventId) {
     return;
   }
   if (eventRegistrations(eventId).length > 0) {
-    showNotice("This event has registrations and cannot be deleted. Edit its status to Completed instead.", "error");
+    completeEvent(eventId);
     return;
   }
   if (!window.confirm(`Delete "${event.name}"? This cannot be undone.`)) {
@@ -531,6 +536,28 @@ function deleteEvent(eventId) {
   }
   render();
   showNotice("Event deleted.");
+}
+
+function completeEvent(eventId) {
+  const event = data.events.find((item) => item.id === eventId);
+  if (!event) {
+    showNotice("That event could not be found.", "error");
+    return;
+  }
+  if (event.status === "Completed") {
+    showNotice("This event is already Completed.");
+    return;
+  }
+
+  const previousStatus = event.status;
+  event.status = "Completed";
+  if (!saveData()) {
+    event.status = previousStatus;
+    return;
+  }
+
+  render();
+  showNotice(`"${event.name}" moved to Completed. Its registrations and attendance records were kept.`);
 }
 
 function cancelRegistration(registrationId) {
@@ -598,6 +625,8 @@ elements.eventsBody.addEventListener("click", (clickEvent) => {
     document.querySelector("#registrations").scrollIntoView({ behavior: "smooth", block: "start" });
   } else if (button.dataset.action === "edit-event" && event) {
     openEventDialog(event);
+  } else if (button.dataset.action === "complete-event") {
+    completeEvent(button.dataset.eventId);
   } else if (button.dataset.action === "delete-event") {
     deleteEvent(button.dataset.eventId);
   }
